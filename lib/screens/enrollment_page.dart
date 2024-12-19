@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/subject.dart';
 import '../services/subject_service.dart';
+import '../theme/app_theme.dart';
 
 class EnrollmentPage extends StatefulWidget {
   @override
@@ -10,17 +11,19 @@ class EnrollmentPage extends StatefulWidget {
 }
 
 class _EnrollmentPageState extends State<EnrollmentPage> {
-  final Set<Subject> selectedSubjects = {};
   final SubjectService _subjectService = SubjectService();
   List<Subject> availableSubjects = [];
+  Set<Subject> selectedSubjects = {};
   int totalCredits = 0;
-  static const int maxCredits = 24;
+  final int maxCredits = 24;
+  bool isLoading = false;
   bool isEnrolled = false;
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    selectedSubjects = {};
+    totalCredits = 0;
     checkEnrollmentStatus();
   }
 
@@ -65,8 +68,6 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
   }
 
   void toggleSubject(Subject subject) {
-    if (isEnrolled) return;
-
     setState(() {
       if (selectedSubjects.contains(subject)) {
         selectedSubjects.remove(subject);
@@ -78,16 +79,8 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Cannot exceed $maxCredits credits',
-                style: TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.red.shade400,
-              behavior: SnackBarBehavior.floating,
-              margin: EdgeInsets.all(16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              content: Text('Maximum credits exceeded'),
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -99,17 +92,15 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        await FirebaseFirestore.instance
-            .collection('students')
-            .doc(user.uid)
-            .set({
-          'enrolledSubjects': selectedSubjects.map((s) => {
-            'name': s.name,
-            'credits': s.credits,
-          }).toList(),
+        await FirebaseFirestore.instance.collection('students').doc(user.uid).update({
+          'enrolledSubjects': selectedSubjects
+              .map((subject) => {
+                    'name': subject.name,
+                    'credits': subject.credits,
+                  })
+              .toList(),
           'totalCredits': totalCredits,
-          'lastUpdated': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+        });
 
         setState(() {
           isEnrolled = true;
@@ -117,110 +108,206 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Enrollment saved successfully'),
-            backgroundColor: Colors.green,
+            content: Text(
+              'Enrollment successful!',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: AppTheme.successColor,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error saving enrollment: $e'),
-            backgroundColor: Colors.red,
+            content: Text(
+              'Failed to save enrollment',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: AppTheme.errorColor,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
     }
   }
 
+  Widget _buildSubjectCard(Subject subject, bool isSelected) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? Color(0xFFF3E5F5) : Colors.white,
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryColor.withOpacity(0.3) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isEnrolled ? null : () => toggleSubject(subject),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppTheme.primaryColor.withOpacity(0.1) : Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.book_outlined,
+                      color: isSelected ? AppTheme.primaryColor : Colors.grey[400],
+                      size: 20,
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          subject.name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected ? AppTheme.primaryColor : Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '${subject.credits} Credits',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isSelected ? AppTheme.primaryColor.withOpacity(0.8) : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isSelected)
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: Text(
-          'Course Enrollment',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
+          isEnrolled ? 'Enrollment Summary' : 'Course Enrollment',
+          style: TextStyle(color: AppTheme.textLight),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
-        ),
+        backgroundColor: AppTheme.primaryColor,
+        elevation: 0,
+        actions: [
+          if (!isEnrolled && selectedSubjects.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: TextButton(
+                onPressed: saveEnrollment,
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    color: AppTheme.textLight,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: Colors.deepPurple,
+                color: AppTheme.primaryColor,
               ),
             )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Credits info card
-                    Container(
-                      padding: EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
+          : Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Credits Selected',
+                            'Selected Credits: $totalCredits/$maxCredits',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: AppTheme.textLight,
                               fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            '$totalCredits / $maxCredits',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppTheme.textLight.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          ),
-                          SizedBox(height: 16),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: LinearProgressIndicator(
-                              value: totalCredits / maxCredits,
-                              backgroundColor: Colors.white.withOpacity(0.2),
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              minHeight: 8,
+                            child: Text(
+                              isEnrolled ? 'Enrolled' : 'Not Enrolled',
+                              style: TextStyle(
+                                color: AppTheme.textLight,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: 24),
-                    Text(
-                      'Available Courses',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    FutureBuilder<List<Subject>>(
-                      future: Future(() async {
-                        final subjects = await _subjectService.getSubjects().first;
-                        return subjects;
-                      }),
+                    ],
+                  ),
+                ),
+                if (!isEnrolled)
+                  Expanded(
+                    child: FutureBuilder<List<Subject>>(
+                      future: _subjectService.getSubjects().first,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
                             child: CircularProgressIndicator(
-                              color: Colors.deepPurple,
+                              color: AppTheme.primaryColor,
                             ),
                           );
                         }
@@ -234,177 +321,88 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                           );
                         }
 
-                        final subjects = snapshot.data ?? [];
-                        return Column(
-                          children: subjects.map((subject) {
+                        availableSubjects = snapshot.data ?? [];
+                        return ListView.builder(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          itemCount: availableSubjects.length,
+                          itemBuilder: (context, index) {
+                            final subject = availableSubjects[index];
                             final isSelected = selectedSubjects.contains(subject);
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 12),
-                              decoration: BoxDecoration(
-                                color: isSelected ? Colors.deepPurple.withOpacity(0.05) : Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isSelected ? Colors.deepPurple : Colors.grey[200]!,
-                                  width: isSelected ? 2 : 1,
-                                ),
-                              ),
-                              child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: isSelected ? Colors.deepPurple.withOpacity(0.1) : Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    Icons.book_outlined,
-                                    color: isSelected ? Colors.deepPurple : Colors.grey[600],
-                                  ),
-                                ),
-                                title: Text(
-                                  subject.name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 4),
-                                    Text(
-                                      '${subject.credits} Credits',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                    if (isSelected)
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 4),
-                                        child: Text(
-                                          'Selected',
-                                          style: TextStyle(
-                                            color: Colors.deepPurple,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                trailing: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isSelected ? Colors.deepPurple : Colors.transparent,
-                                    border: Border.all(
-                                      color: isSelected ? Colors.deepPurple : Colors.grey[400]!,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: isSelected
-                                      ? Icon(
-                                          Icons.check,
-                                          size: 18,
-                                          color: Colors.white,
-                                        )
-                                      : null,
-                                ),
-                                onTap: () {
-                                  if (!isSelected && totalCredits + subject.credits > maxCredits) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Cannot exceed $maxCredits credits. Currently selected: $totalCredits credits.',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        backgroundColor: Colors.red.shade400,
-                                        behavior: SnackBarBehavior.floating,
-                                        margin: EdgeInsets.all(16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  toggleSubject(subject);
-                                },
-                              ),
-                            );
-                          }).toList(),
+                            return _buildSubjectCard(subject, isSelected);
+                          },
                         );
                       },
                     ),
-                    SizedBox(height: 24),
-                    if (!isEnrolled && selectedSubjects.isNotEmpty)
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                  ),
+                if (isEnrolled)
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enrolled Subjects',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textPrimary,
+                            ),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        onPressed: () async {
-                          try {
-                            await saveEnrollment();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Successfully enrolled in courses',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: Colors.green,
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                          SizedBox(height: 16),
+                          ...selectedSubjects.map((subject) => Card(
+                            margin: EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primaryColor.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.book_outlined,
+                                      color: AppTheme.primaryColor,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          subject.name,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.textPrimary,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          '${subject.credits} Credits',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppTheme.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                            Navigator.pop(context);
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Failed to enroll in courses',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: Colors.red,
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          'Confirm Enrollment',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                            ),
+                          )).toList(),
+                        ],
                       ),
-                    if (isEnrolled)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text(
-                          'You are already enrolled in courses',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+              ],
             ),
     );
   }

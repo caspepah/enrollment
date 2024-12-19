@@ -20,4 +20,13 @@ class Subject {
       credits: map['credits'] ?? 0,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Subject && other.name == name && other.credits == credits;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ credits.hashCode;
 }

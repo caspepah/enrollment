@@ -4,6 +4,7 @@ import 'login.dart';
 import 'enrollment_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../theme/app_theme.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -26,24 +27,17 @@ class HomePage extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
+                  gradient: AppTheme.primaryGradient,
                 ),
+                padding: EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -55,12 +49,12 @@ class HomePage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: AppTheme.textLight,
                           ),
                         ),
                         IconButton(
                           icon: Icon(Icons.logout_outlined),
-                          color: Colors.grey[700],
+                          color: AppTheme.textLight,
                           onPressed: () async {
                             await _auth.signOut();
                             Navigator.pushReplacement(
@@ -70,6 +64,14 @@ class HomePage extends StatelessWidget {
                           },
                         ),
                       ],
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      user?.email ?? '',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppTheme.textLight.withOpacity(0.8),
+                      ),
                     ),
                   ],
                 ),
@@ -82,7 +84,7 @@ class HomePage extends StatelessWidget {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator(
-                          color: Colors.deepPurple,
+                          color: AppTheme.primaryColor,
                         ),
                       );
                     }
@@ -91,14 +93,19 @@ class HomePage extends StatelessWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          'Your Information',
+                          style: AppTheme.headingStyle.copyWith(fontSize: 24),
+                        ),
+                        SizedBox(height: 16),
                         Container(
                           padding: EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppTheme.cardColor,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: AppTheme.primaryColor.withOpacity(0.1),
                                 blurRadius: 10,
                                 offset: Offset(0, 5),
                               ),
@@ -107,170 +114,57 @@ class HomePage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.deepPurple.withOpacity(0.1),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.person_outline,
-                                      color: Colors.deepPurple,
-                                      size: 24,
-                                    ),
-                                  ),
-                                  SizedBox(width: 16),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        userData?['name'] ?? 'Student',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        user?.email ?? 'No email',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                              _buildInfoRow(
+                                'Name',
+                                userData?['name'] ?? 'Not set',
+                                Icons.person_outline,
                               ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Container(
-                          padding: EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Quick Actions',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                              Divider(height: 24),
+                              _buildInfoRow(
+                                'Email',
+                                userData?['email'] ?? user?.email ?? 'Not set',
+                                Icons.email_outlined,
                               ),
-                              SizedBox(height: 16),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.deepPurple,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => EnrollmentPage()),
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.school_outlined),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Enroll in Courses',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        // Enrolled Courses Section (if any)
-                        if (userData != null && userData['enrolledSubjects'] != null)
-                          Container(
-                            padding: EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
+                              if (userData?['enrolledSubjects'] != null) ...[
+                                Divider(height: 24),
+                                _buildInfoRow(
+                                  'Enrolled Subjects',
+                                  (userData?['enrolledSubjects'] as List).length.toString(),
+                                  Icons.school_outlined,
                                 ),
                               ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        ElevatedButton(
+                          style: AppTheme.primaryButtonStyle,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EnrollmentPage(),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                Icon(Icons.add_circle_outline),
+                                SizedBox(width: 8),
                                 Text(
-                                  'Enrolled Courses',
+                                  'Manage Enrollment',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
                                   ),
                                 ),
-                                SizedBox(height: 16),
-                                ...(userData['enrolledSubjects'] as List<dynamic>).map((subject) {
-                                  return Container(
-                                    margin: EdgeInsets.only(bottom: 12),
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.book_outlined,
-                                          color: Colors.deepPurple,
-                                        ),
-                                        SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                subject['name'],
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                              Text(
-                                                '${subject['credits']} Credits',
-                                                style: TextStyle(
-                                                  color: Colors.grey[600],
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
                               ],
                             ),
                           ),
+                        ),
                       ],
                     );
                   },
@@ -280,6 +174,49 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: AppTheme.primaryColor,
+            size: 24,
+          ),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

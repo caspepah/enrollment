@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "629634495701",
-    "project_id": "mp-enroll",
-    "storage_bucket": "mp-enroll.firebasestorage.app"
+    "project_number": "324963913766",
+    "project_id": "enrollapp-64250",
+    "storage_bucket": "enrollapp-64250.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:629634495701:android:da5fb27e07831d18b11e5c",
+        "mobilesdk_app_id": "1:324963913766:android:08a9d31976b01561c316e7",
         "android_client_info": {
           "package_name": "com.example.enroll_app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA4onm07HaZavhIpfGP7ZWy-ksihPb5hxw"
+          "current_key": "AIzaSyBFjJiq6xv5MOfda96jtGfmu-thjHNa6_g"
         }
       ],
       "services": {
