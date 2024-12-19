@@ -140,84 +140,83 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
   }
 
   Widget _buildSubjectCard(Subject subject, bool isSelected) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      color: Colors.white,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: isSelected ? Color(0xFFF3E5F5) : Colors.white,
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryColor.withOpacity(0.3) : Colors.transparent,
-            width: 1,
-          ),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.cardColor,
+        border: Border.all(
+          color: isSelected ? AppTheme.secondaryColor : AppTheme.secondaryColor.withOpacity(0.3),
+          width: 2,
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: isEnrolled ? null : () => toggleSubject(subject),
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnrolled ? null : () => toggleSubject(subject),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppTheme.secondaryColor.withOpacity(0.2) : AppTheme.backgroundColor,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: isSelected ? AppTheme.secondaryColor : AppTheme.secondaryColor.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.book,
+                    color: isSelected ? AppTheme.secondaryColor : AppTheme.textSecondary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subject.name,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                          fontFamily: 'Roboto Slab',
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        '${subject.credits} Credits',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.textSecondary,
+                          fontFamily: 'Roboto Slab',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isSelected)
                   Container(
-                    width: 40,
-                    height: 40,
+                    padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppTheme.primaryColor.withOpacity(0.1) : Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppTheme.secondaryColor,
+                      shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.book_outlined,
-                      color: isSelected ? AppTheme.primaryColor : Colors.grey[400],
-                      size: 20,
+                      Icons.check,
+                      color: AppTheme.textLight,
+                      size: 16,
                     ),
                   ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          subject.name,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected ? AppTheme.primaryColor : Colors.black87,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '${subject.credits} Credits',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isSelected ? AppTheme.primaryColor.withOpacity(0.8) : Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (isSelected)
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                ],
-              ),
+              ],
             ),
           ),
         ),
@@ -231,8 +230,14 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: Text(
-          isEnrolled ? 'Enrollment Summary' : 'Course Enrollment',
-          style: TextStyle(color: AppTheme.textLight),
+          isEnrolled ? 'ENROLLMENT SUMMARY' : 'COURSE ENROLLMENT',
+          style: TextStyle(
+            color: AppTheme.textLight,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            fontFamily: 'Playfair Display',
+          ),
         ),
         backgroundColor: AppTheme.primaryColor,
         elevation: 0,
@@ -243,10 +248,12 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
               child: TextButton(
                 onPressed: saveEnrollment,
                 child: Text(
-                  'Save',
+                  'SAVE',
                   style: TextStyle(
                     color: AppTheme.textLight,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                    fontFamily: 'Roboto Slab',
                   ),
                 ),
               ),
@@ -256,15 +263,18 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: AppTheme.primaryColor,
+                color: AppTheme.secondaryColor,
               ),
             )
           : Column(
               children: [
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: AppTheme.primaryColor,
+                    border: Border(
+                      bottom: BorderSide(color: AppTheme.secondaryColor, width: 3),
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -272,25 +282,29 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Selected Credits: $totalCredits/$maxCredits',
+                            'CREDITS: $totalCredits/$maxCredits',
                             style: TextStyle(
                               color: AppTheme.textLight,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                              fontFamily: 'Roboto Slab',
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: AppTheme.textLight.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppTheme.textLight, width: 2),
+                              borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              isEnrolled ? 'Enrolled' : 'Not Enrolled',
+                              isEnrolled ? 'ENROLLED' : 'NOT ENROLLED',
                               style: TextStyle(
                                 color: AppTheme.textLight,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                                fontFamily: 'Roboto Slab',
                               ),
                             ),
                           ),
@@ -307,7 +321,7 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
                             child: CircularProgressIndicator(
-                              color: AppTheme.primaryColor,
+                              color: AppTheme.secondaryColor,
                             ),
                           );
                         }
@@ -316,14 +330,17 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                           return Center(
                             child: Text(
                               'Error loading courses',
-                              style: TextStyle(color: Colors.red),
+                              style: TextStyle(
+                                color: AppTheme.errorColor,
+                                fontFamily: 'Roboto Slab',
+                              ),
                             ),
                           );
                         }
 
                         availableSubjects = snapshot.data ?? [];
                         return ListView.builder(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.symmetric(vertical: 16),
                           itemCount: availableSubjects.length,
                           itemBuilder: (context, index) {
                             final subject = availableSubjects[index];
@@ -337,65 +354,86 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                 if (isEnrolled)
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Enrolled Subjects',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.textPrimary,
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: AppTheme.secondaryColor, width: 2),
+                              ),
+                            ),
+                            child: Text(
+                              'ENROLLED SUBJECTS',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                                color: AppTheme.primaryColor,
+                                fontFamily: 'Playfair Display',
+                              ),
                             ),
                           ),
-                          SizedBox(height: 16),
-                          ...selectedSubjects.map((subject) => Card(
-                            margin: EdgeInsets.only(bottom: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.primaryColor.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      Icons.book_outlined,
-                                      color: AppTheme.primaryColor,
-                                    ),
-                                  ),
-                                  SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          subject.name,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppTheme.textPrimary,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          '${subject.credits} Credits',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: AppTheme.textSecondary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                          SizedBox(height: 20),
+                          ...selectedSubjects.map((subject) => Container(
+                            margin: EdgeInsets.only(bottom: 16),
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppTheme.cardColor,
+                              border: Border.all(
+                                color: AppTheme.secondaryColor.withOpacity(0.5),
+                                width: 2,
                               ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.backgroundColor,
+                                    border: Border.all(
+                                      color: AppTheme.secondaryColor.withOpacity(0.3),
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    Icons.book,
+                                    color: AppTheme.secondaryColor,
+                                    size: 24,
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        subject.name,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppTheme.textPrimary,
+                                          fontFamily: 'Roboto Slab',
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        '${subject.credits} Credits',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppTheme.textSecondary,
+                                          fontFamily: 'Roboto Slab',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           )).toList(),
                         ],

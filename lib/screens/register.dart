@@ -127,177 +127,154 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppTheme.primaryColor.withOpacity(0.1),
-              AppTheme.backgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Back button
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 40),
+              // Retro Header
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: AppTheme.secondaryColor, width: 2),
+                    bottom: BorderSide(color: AppTheme.secondaryColor, width: 2),
                   ),
-                  SizedBox(height: 20),
-                  // Header
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppTheme.cardColor,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryColor.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
-                        ),
-                      ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'REGISTER',
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 4,
+                        color: AppTheme.primaryColor,
+                        fontFamily: 'Playfair Display',
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.person_add_outlined,
-                            size: 50,
-                            color: AppTheme.primaryColor,
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          'Create Account',
-                          style: AppTheme.headingStyle,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Sign up to Enroll',
-                          style: AppTheme.subheadingStyle,
-                        ),
-                      ],
+                    SizedBox(height: 8),
+                    Text(
+                      'Create Your Account',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: AppTheme.textSecondary,
+                        fontFamily: 'Roboto Slab',
+                        letterSpacing: 1,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 32),
-                  // Registration form
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.cardColor,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryColor.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: TextFormField(
-                            decoration: AppTheme.inputDecoration('Full Name', Icons.person_outline),
-                            validator: (val) => val!.isEmpty ? 'Enter your name' : null,
-                            onChanged: (val) {
-                              setState(() => name = val);
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.cardColor,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryColor.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: TextFormField(
-                            decoration: AppTheme.inputDecoration('Email', Icons.email_outlined),
-                            validator: (val) => val!.isEmpty ? 'Enter an email' : null,
-                            onChanged: (val) {
-                              setState(() => email = val);
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.cardColor,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryColor.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: TextFormField(
-                            decoration: AppTheme.inputDecoration('Password', Icons.lock_outline),
-                            obscureText: true,
-                            validator: (val) =>
-                                val!.length < 6 ? 'Enter a password 6+ chars long' : null,
-                            onChanged: (val) {
-                              setState(() => password = val);
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        ElevatedButton(
-                          style: AppTheme.primaryButtonStyle,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            child: Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          onPressed: _register,
-                        ),
-                        SizedBox(height: 12),
-                        if (error.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text(
-                              error,
-                              style: TextStyle(
-                                color: AppTheme.errorColor,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              SizedBox(height: 40),
+              // Form
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // Name Field
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.secondaryColor.withOpacity(0.5), width: 2),
+                      ),
+                      child: TextFormField(
+                        decoration: AppTheme.inputDecoration('Full Name', Icons.person),
+                        validator: (val) => val!.isEmpty ? 'Enter your name' : null,
+                        onChanged: (val) => setState(() => name = val),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    // Email Field
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.secondaryColor.withOpacity(0.5), width: 2),
+                      ),
+                      child: TextFormField(
+                        decoration: AppTheme.inputDecoration('Email', Icons.email),
+                        validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                        onChanged: (val) => setState(() => email = val),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    // Password Field
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.secondaryColor.withOpacity(0.5), width: 2),
+                      ),
+                      child: TextFormField(
+                        decoration: AppTheme.inputDecoration('Password', Icons.lock),
+                        obscureText: true,
+                        validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
+                        onChanged: (val) => setState(() => password = val),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    // Register Button
+                    ElevatedButton(
+                      style: AppTheme.elevatedButtonStyle,
+                      onPressed: loading ? null : _register,
+                      child: loading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: AppTheme.textLight,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text('REGISTER'),
+                    ),
+                    if (error.isNotEmpty) ...[
+                      SizedBox(height: 20),
+                      Text(
+                        error,
+                        style: TextStyle(
+                          color: AppTheme.errorColor,
+                          fontSize: 14,
+                          fontFamily: 'Roboto Slab',
+                        ),
+                      ),
+                    ],
+                    SizedBox(height: 30),
+                    // Login Link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Already have an account? ',
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontFamily: 'Roboto Slab',
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                          ),
+                          child: Text(
+                            'Login here',
+                            style: TextStyle(
+                              color: AppTheme.accentColor,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Roboto Slab',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -33,11 +33,15 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Retro Header
               Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  color: AppTheme.primaryColor,
+                  border: Border(
+                    bottom: BorderSide(color: AppTheme.secondaryColor, width: 3),
+                  ),
                 ),
-                padding: EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -45,15 +49,17 @@ class HomePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Student Dashboard',
+                          'DASHBOARD',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: 28,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: 3,
                             color: AppTheme.textLight,
+                            fontFamily: 'Playfair Display',
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.logout_outlined),
+                          icon: Icon(Icons.logout),
                           color: AppTheme.textLight,
                           onPressed: () async {
                             await _auth.signOut();
@@ -65,12 +71,13 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 8),
                     Text(
                       user?.email ?? '',
                       style: TextStyle(
                         fontSize: 16,
-                        color: AppTheme.textLight.withOpacity(0.8),
+                        color: AppTheme.textLight.withOpacity(0.9),
+                        fontFamily: 'Roboto Slab',
                       ),
                     ),
                   ],
@@ -84,7 +91,7 @@ class HomePage extends StatelessWidget {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator(
-                          color: AppTheme.primaryColor,
+                          color: AppTheme.secondaryColor,
                         ),
                       );
                     }
@@ -93,75 +100,59 @@ class HomePage extends StatelessWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Your Information',
-                          style: AppTheme.headingStyle.copyWith(fontSize: 24),
-                        ),
-                        SizedBox(height: 16),
                         Container(
-                          padding: EdgeInsets.all(24),
+                          padding: EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: AppTheme.cardColor,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryColor.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
+                            border: Border(
+                              bottom: BorderSide(color: AppTheme.secondaryColor, width: 2),
+                            ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildInfoRow(
-                                'Name',
-                                userData?['name'] ?? 'Not set',
-                                Icons.person_outline,
-                              ),
-                              Divider(height: 24),
-                              _buildInfoRow(
-                                'Email',
-                                userData?['email'] ?? user?.email ?? 'Not set',
-                                Icons.email_outlined,
-                              ),
-                              if (userData?['enrolledSubjects'] != null) ...[
-                                Divider(height: 24),
-                                _buildInfoRow(
-                                  'Enrolled Subjects',
-                                  (userData?['enrolledSubjects'] as List).length.toString(),
-                                  Icons.school_outlined,
-                                ),
-                              ],
-                            ],
+                          child: Text(
+                            'YOUR INFORMATION',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                              color: AppTheme.primaryColor,
+                              fontFamily: 'Playfair Display',
+                            ),
                           ),
                         ),
                         SizedBox(height: 24),
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: AppTheme.cardColor,
+                            border: Border.all(
+                              color: AppTheme.secondaryColor.withOpacity(0.5),
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              _buildInfoRow('Name', userData?['name'] ?? 'Not set'),
+                              SizedBox(height: 16),
+                              _buildInfoRow('Email', user?.email ?? 'Not set'),
+                              SizedBox(height: 16),
+                              _buildInfoRow('Status', userData?['status'] ?? 'Not enrolled'),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 32),
                         ElevatedButton(
-                          style: AppTheme.primaryButtonStyle,
+                          style: AppTheme.elevatedButtonStyle,
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => EnrollmentPage(),
-                              ),
+                              MaterialPageRoute(builder: (context) => EnrollmentPage()),
                             );
                           },
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.add_circle_outline),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Manage Enrollment',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                          child: Text(
+                            'ENROLL NOW',
+                            style: TextStyle(
+                              letterSpacing: 2,
+                              fontFamily: 'Roboto Slab',
                             ),
                           ),
                         ),
@@ -177,43 +168,33 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, IconData icon) {
+  Widget _buildInfoRow(String label, String value) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppTheme.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: AppTheme.primaryColor,
-            size: 24,
+        Expanded(
+          flex: 2,
+          child: Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textSecondary,
+              fontFamily: 'Roboto Slab',
+              letterSpacing: 1,
+            ),
           ),
         ),
         SizedBox(width: 16),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 14,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                value,
-                style: TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          flex: 3,
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              color: AppTheme.textPrimary,
+              fontFamily: 'Roboto Slab',
+            ),
           ),
         ),
       ],
