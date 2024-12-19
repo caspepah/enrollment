@@ -102,14 +102,14 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
         await FirebaseFirestore.instance
             .collection('students')
             .doc(user.uid)
-            .update({
+            .set({
           'enrolledSubjects': selectedSubjects.map((s) => {
             'name': s.name,
             'credits': s.credits,
           }).toList(),
           'totalCredits': totalCredits,
           'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        }, SetOptions(merge: true));
 
         setState(() {
           isEnrolled = true;
@@ -138,44 +138,55 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
         SliverToBoxAdapter(
           child: Container(
             margin: EdgeInsets.all(20),
-            padding: EdgeInsets.all(24),
+            padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.deepPurple.shade300,
+                  Colors.deepPurple.shade500,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 20,
-                  offset: Offset(0, 4),
+                  color: Colors.deepPurple.withOpacity(0.3),
+                  blurRadius: 15,
+                  offset: Offset(0, 8),
                 ),
               ],
             ),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.school_outlined, 
-                         color: Colors.deepPurple.shade400, 
-                         size: 28),
-                    SizedBox(width: 12),
-                    Text(
-                      'Total Credits',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    Icons.school,
+                    color: Colors.white,
+                    size: 40,
+                  ),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 20),
+                Text(
+                  'Total Credits',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+                SizedBox(height: 10),
                 Text(
                   '$totalCredits',
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -189,45 +200,59 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
               (context, index) {
                 final subject = selectedSubjects.elementAt(index);
                 return Container(
-                  margin: EdgeInsets.only(bottom: 12),
+                  margin: EdgeInsets.only(bottom: 15),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1,
-                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    title: Text(
-                      subject.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    trailing: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple.shade50,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '${subject.credits} cr',
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurple.shade50,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Icon(
+                            Icons.book_outlined,
+                            color: Colors.deepPurple,
+                            size: 24,
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                subject.name,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '${subject.credits} Credits',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -246,29 +271,49 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
         SliverToBoxAdapter(
           child: Container(
             margin: EdgeInsets.all(20),
-            padding: EdgeInsets.all(24),
+            padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.deepPurple.shade300,
+                  Colors.deepPurple.shade500,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 20,
-                  offset: Offset(0, 4),
+                  color: Colors.deepPurple.withOpacity(0.3),
+                  blurRadius: 15,
+                  offset: Offset(0, 8),
                 ),
               ],
             ),
             child: Column(
               children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    Icons.credit_card,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                SizedBox(height: 20),
                 Text(
                   'Credit Limit',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade600,
+                    color: Colors.white.withOpacity(0.9),
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -277,17 +322,17 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                     Text(
                       '$totalCredits',
                       style: TextStyle(
-                        fontSize: 36,
+                        fontSize: 48,
                         fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
+                        color: Colors.white,
                       ),
                     ),
                     Text(
                       ' / $maxCredits',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 24,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
+                        color: Colors.white.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -304,80 +349,108 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                 final subject = availableSubjects[index];
                 final isSelected = selectedSubjects.contains(subject);
                 
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: Material(
-                    color: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isSelected ? Colors.deepPurple : Colors.grey.shade200,
-                        width: isSelected ? 2 : 1,
+                return GestureDetector(
+                  onTap: () => toggleSubject(subject),
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected ? Colors.deepPurple : Colors.transparent,
+                        width: 2,
                       ),
-                    ),
-                    child: InkWell(
-                      onTap: () => toggleSubject(subject),
-                      borderRadius: BorderRadius.circular(16),
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    subject.name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.deepPurple.shade50,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      '${subject.credits} credits',
-                                      style: TextStyle(
-                                        color: Colors.deepPurple,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected ? Colors.deepPurple : Colors.grey.shade400,
-                                  width: 2,
-                                ),
-                                color: isSelected ? Colors.deepPurple : Colors.transparent,
-                              ),
-                              child: isSelected
-                                  ? Icon(
-                                      Icons.check,
-                                      size: 16,
-                                      color: Colors.white,
-                                    )
-                                  : null,
-                            ),
-                          ],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
                         ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isSelected 
+                                  ? Colors.deepPurple.shade100
+                                  : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Icon(
+                              Icons.book_outlined,
+                              color: isSelected 
+                                  ? Colors.deepPurple
+                                  : Colors.grey.shade600,
+                              size: 24,
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  subject.name,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Colors.deepPurple.shade50
+                                        : Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '${subject.credits} Credits',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isSelected
+                                          ? Colors.deepPurple
+                                          : Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.transparent
+                                    : Colors.grey.shade300,
+                                width: 2,
+                              ),
+                              color: isSelected
+                                  ? Colors.deepPurple
+                                  : Colors.white,
+                            ),
+                            child: isSelected
+                                ? Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -387,26 +460,26 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
             ),
           ),
         ),
-        if (!isEnrolled && selectedSubjects.isNotEmpty)
+        if (!isEnrolled && availableSubjects.isNotEmpty)
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(20),
               child: ElevatedButton(
-                onPressed: saveEnrollment,
+                onPressed: selectedSubjects.isNotEmpty ? saveEnrollment : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  minimumSize: Size(double.infinity, 50),
+                  elevation: 2,
                 ),
                 child: Text(
-                  'Confirm Enrollment',
+                  'Save Enrollment',
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -419,10 +492,21 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(isEnrolled ? 'My Enrollment' : 'Choose Subjects'),
+        title: Text(
+          isEnrolled ? 'My Enrollment' : 'Choose Subjects',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -438,7 +522,6 @@ class _EnrollmentPageState extends State<EnrollmentPage> {
                   return Center(child: CircularProgressIndicator());
                 }
 
-                // Only update availableSubjects if it's empty
                 if (availableSubjects.isEmpty) {
                   availableSubjects = snapshot.data!;
                 }
